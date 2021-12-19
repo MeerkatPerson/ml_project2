@@ -24,6 +24,10 @@ if __name__ == '__main__':
 
     models_saved, metrics = do_train('audio_mnist', 'complex_', Audio_MNIST_complex_Model, 'avg', complex_relu, cross_entropy, 0.001)
 
+    """
+    Note: The stuff below I have not yet parameterized
+    """
+
     #computing the number of parameters
     tot_params = 0
     for chiave in models_saved[0].params['params'].keys():
