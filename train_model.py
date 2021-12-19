@@ -19,13 +19,14 @@ from utils import *
 
 """
 - dataset: the dataset to use (MNIST/Audio MNIST/CIFAR-10)
+- type_: 'complex_' or 'real_'
 - Model: the model to use (see models.py)
 - pool: one of 'avg' and 'max', for pooling layer
 - activation: the activation to use, see activations.py
 - loss_fn: the loss function to use, from losses.py
 - l_rate: the learning rate to use
 """
-def do_train(dataset, Model, pool, activation, loss_fun, l_rate):
+def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
 
     """
     Load the data and generate input depending on the dataset (different shapes)
@@ -80,7 +81,11 @@ def do_train(dataset, Model, pool, activation, loss_fun, l_rate):
         val_grad_fn = jax.value_and_grad(_loss_fn)
         # compute loss and gradient
         loss, grads = val_grad_fn(state.params)
-        grads = jax.tree_map(lambda x: x.conj(), grads) 
+
+        # Compute the conjugate if complex model
+        if type_ == 'complex_':
+            grads = jax.tree_map(lambda x: x.conj(), grads) 
+
         # update the state parameters 
         state = state.apply_gradients(grads=grads)
 
@@ -95,7 +100,11 @@ def do_train(dataset, Model, pool, activation, loss_fun, l_rate):
             _loss_fn3 = partial(loss_fn, dropout_rng = dropout_rng, images=new_images, labels=batch['label'])
             val_grad_fn3 = jax.value_and_grad(_loss_fn3)
             loss, grads = val_grad_fn3(state.params)
-            grads = jax.tree_map(lambda x: x.conj(), grads) 
+            
+            # Compute the conjugate if complex model
+            if type_ == 'complex_':
+                grads = jax.tree_map(lambda x: x.conj(), grads) 
+
             state = state.apply_gradients(grads=grads)
             # Evaluate the network again to get the log-probability distribution
         # over the batch images

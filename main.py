@@ -11,7 +11,18 @@ import pickle
 
 if __name__ == '__main__':
 
-    models_saved, metrics = do_train('audio_mnist', Audio_MNIST_Model, 'avg', complex_relu, cross_entropy, 0.001)
+    """
+    All the horrible messiness is hidden, yay! Just put in the following parameters:
+    * dataset: 'mnist', 'audio_mnist', 'cifar-10' (cifar not yet supported)
+    * type: complex_ or real_
+    * model: see models.py
+    * pool: 'avg' or 'max' for pooling layer
+    * activation: see activations.py
+    * loss: see losses.py
+    * learning_rate: for mnist 0.0005 is ideal apparently, for audio_mnist 0.001 performs well
+    """
+
+    models_saved, metrics = do_train('audio_mnist', 'complex_', Audio_MNIST_complex_Model, 'avg', complex_relu, cross_entropy, 0.001)
 
     #computing the number of parameters
     tot_params = 0
