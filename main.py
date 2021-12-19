@@ -14,7 +14,7 @@ if __name__ == '__main__':
     """
     All the horrible messiness is hidden, yay! Just put in the following parameters:
     * dataset: 'mnist', 'audio_mnist', 'cifar-10' (cifar not yet supported)
-    * type: complex_ or real_
+    * type: 'complex' or 'real'
     * model: see models.py
     * pool: 'avg' or 'max' for pooling layer
     * activation: see activations.py
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     * learning_rate: for mnist 0.0005 is ideal apparently, for audio_mnist 0.001 performs well
     """
 
-    models_saved, metrics = do_train('audio_mnist', 'complex_', Audio_MNIST_complex_Model, 'avg', complex_relu, cross_entropy, 0.001)
+    models_saved, metrics = do_train('mnist', 'complex', Audio_MNIST_complex_Model, 'avg', zrelu, cross_entropy, 0.0005)
 
     """
     Note: The stuff below I have not yet parameterized

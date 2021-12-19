@@ -19,7 +19,7 @@ from utils import *
 
 """
 - dataset: the dataset to use (MNIST/Audio MNIST/CIFAR-10)
-- type_: 'complex_' or 'real_'
+- type_: 'complex' or 'real'
 - Model: the model to use (see models.py)
 - pool: one of 'avg' and 'max', for pooling layer
 - activation: the activation to use, see activations.py
@@ -36,7 +36,13 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
 
         train_data, test_data = load_data.load_mnist()
 
-        sample_input = jnp.ones([1, 28, 28, 1])
+        if type_ == 'complex':
+
+            sample_input = jax._src.nn.initializers._complex_uniform(jax.random.PRNGKey(0), shape=[1, 28, 28, 1], dtype=complex)
+
+        else:
+        
+            sample_input = jnp.ones([1, 28, 28, 1])
 
         num_epochs = 10
 
@@ -44,7 +50,13 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
 
         train_data, test_data = load_data.load_audio_mnist()
 
-        sample_input = jnp.ones([1, 20, 35])
+        if type_ == 'complex':
+
+            sample_input = jax._src.nn.initializers._complex_uniform(jax.random.PRNGKey(0), shape=[1, 20, 35], dtype=complex)
+
+        else: 
+            
+            sample_input = jnp.ones([1, 20, 35])
 
         num_epochs = 50 # takes longer to converge (at least in the presence of adversarial examples)
 
@@ -83,7 +95,7 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
         loss, grads = val_grad_fn(state.params)
 
         # Compute the conjugate if complex model
-        if type_ == 'complex_':
+        if type_ == 'complex':
             grads = jax.tree_map(lambda x: x.conj(), grads) 
 
         # update the state parameters 
@@ -102,7 +114,7 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
             loss, grads = val_grad_fn3(state.params)
             
             # Compute the conjugate if complex model
-            if type_ == 'complex_':
+            if type_ == 'complex':
                 grads = jax.tree_map(lambda x: x.conj(), grads) 
 
             state = state.apply_gradients(grads=grads)
