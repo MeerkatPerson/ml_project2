@@ -11,7 +11,7 @@ import pickle
 
 if __name__ == '__main__':
 
-    models_saved, metrics = do_train('mnist', MNIST_Model, 'avg', complex_relu, cross_entropy, 0.0005)
+    models_saved, metrics = do_train('audio_mnist', Audio_MNIST_Model, 'avg', complex_relu, cross_entropy, 0.001)
 
     #computing the number of parameters
     tot_params = 0

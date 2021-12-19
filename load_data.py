@@ -26,7 +26,7 @@ def load_audio_mnist():
 
     labels_array = np.array(labels)
 
-    train_data = {'features': fts_array, 'labels': labels_array}
+    train_data = {'image': fts_array, 'label': labels_array} # here 'image' is the mfcc spectrogram
 
     fts_test, labels_test = get_mfcc_data('audio_data/recordings/test/', utterance_length)
 
@@ -34,7 +34,7 @@ def load_audio_mnist():
 
     labels_test_array = np.array(labels_test)
 
-    test_data = {'features': fts_test_array, 'labels': labels_test_array}
+    test_data = {'image': fts_test_array, 'label': labels_test_array}
 
     return train_data, test_data
 

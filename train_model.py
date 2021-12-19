@@ -37,11 +37,15 @@ def do_train(dataset, Model, pool, activation, loss_fun, l_rate):
 
         sample_input = jnp.ones([1, 28, 28, 1])
 
+        num_epochs = 10
+
     elif dataset == 'audio_mnist':
 
         train_data, test_data = load_data.load_audio_mnist()
 
         sample_input = jnp.ones([1, 20, 35])
+
+        num_epochs = 50 # takes longer to converge (at least in the presence of adversarial examples)
 
     """
     Many inner functions; with the current level of entanglement
@@ -177,7 +181,7 @@ def do_train(dataset, Model, pool, activation, loss_fun, l_rate):
         logits = model.apply(params, images, rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=True)
         return loss_fun(logits=logits, labels=labels)
 
-    # ARRAY WHICH WHILL STORE THE MODELS (THERE WILL BE 10)
+    # ARRAY WHICH WHILL STORE THE MODELS (THERE WILL BE 10 BECAUSE WE WANT TO AVERAGE OVER A NUMBER OF MODELS FOR CONFIDENCE IN RESULTS )
     models_saved = []
 
     for s in range(0, 10):
@@ -185,7 +189,6 @@ def do_train(dataset, Model, pool, activation, loss_fun, l_rate):
         momentum = 0.9
         optimiser = optax.sgd(l_rate, momentum)
         #optimiser = nk.optimizer.Adam(learning_rate)
-        num_epochs = 10
         batch_size = 32
         max_steps = 200
 

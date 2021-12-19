@@ -2,6 +2,10 @@
 from jax import *
 import jax.numpy as jnp
 
+from jax.numpy import tanh
+from jax.numpy import cosh
+from jax.numpy import sinh
+
 @jit
 def complex_relu(z):
     return jnp.where(z.real > 0, z, 0)
