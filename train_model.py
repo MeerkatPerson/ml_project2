@@ -252,6 +252,7 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         dropout_rng, init_dropout = jax.random.split(jax.random.PRNGKey(1))
 
         state = create_train_state(init_rng, optimiser, init_dropout)
+        average_metrics = {"test_loss" : 0., "test_accuracy": 0., "train_loss":0., "train_accuracy":0.}
         metrics = {"test_loss" : [], "test_accuracy": [], "train_loss":[], "train_accuracy":[]}
         with tqdm(range(1, num_epochs + 1)) as pbar:
             for epoch in pbar:
@@ -271,7 +272,8 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
                 metrics["train_accuracy"].append(train_metrics["accuracy"])
                 metrics["test_loss"].append(test_loss)
                 metrics["test_accuracy"].append(test_accuracy)
-
+            for k in average_metrics:
+                average_metrics[k] /= 10
         models_saved += [state]
 
-    return models_saved, metrics
+    return models_saved, average_metrics
