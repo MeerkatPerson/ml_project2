@@ -229,7 +229,7 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
     # ARRAY WHICH WHILL STORE THE MODELS (THERE WILL BE 10 BECAUSE WE WANT TO AVERAGE OVER A NUMBER OF MODELS FOR CONFIDENCE IN RESULTS )
     models_saved = []
 
-    for s in range(0, 10):
+    for s in range(5):
         # Definition of optimiser HyperParameters
         momentum = 0.9
         optimiser = optax.sgd(l_rate, momentum)

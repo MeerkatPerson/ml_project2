@@ -45,7 +45,7 @@ def complex_cardioid(z):
     return ((1 + jnp.cos(jnp.angle(z))) + 0j) * z / 2.
 
 # This one below doesn't work as it should atm ... dunno why! At least it results in shit accuracy
-def modrelu(z, b: float = 1., c: float = 1e-3):
+def modrelu(z, bias):
     """
     mod ReLU presented in "Unitary Evolution Recurrent Neural Networks"
         from M. Arjovsky et al. (2016)
@@ -56,5 +56,7 @@ def modrelu(z, b: float = 1., c: float = 1e-3):
         modReLU(z) = ReLU(|z|+b)*z/|z|
     TODO: See how to check the non zero abs.
     """
-    abs_z = jnp.abs(z)
-    return (jax.nn.relu(abs_z + b) + 0j) * z / ((abs_z + c) + 0j)
+    norm = jnp.abs(z)
+    scale = jax.nn.relu(norm + bias) / (norm + 1e-6)
+    scaled = jax.lax.complex(jnp.real(z)*scale, jnp.imag(z)*scale)
+    return scaled

@@ -14,7 +14,11 @@ class MNIST_dense(nk.nn.Module):
     #first convolutions 3x3 --> 32. 
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, (28,28,32))
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     # First pool, Avgpool/MaxPool 2x2 stride 2x2
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -26,7 +30,11 @@ class MNIST_dense(nk.nn.Module):
     # DROPOUT 1
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, (14,14,64))
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     # 2nd pool, Avgpool/MaxPool 2x2 stride 2x2
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -37,7 +45,11 @@ class MNIST_dense(nk.nn.Module):
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=256, dtype=complex)(x)
     # 3rd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, 256)
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     #DROPOUT 2
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     #dense2 and softmax
@@ -58,7 +70,11 @@ class MNIST_module(nk.nn.Module):
     #first convolutions 3x3 --> 32. 
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, (28,28,32))
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     # First pool, Avgpool/MaxPool 2x2 stride 2x2
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -70,7 +86,11 @@ class MNIST_module(nk.nn.Module):
     # DROPOUT 1
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, (14,14,64))
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     # 2nd pool, Avgpool/MaxPool 2x2 stride 2x2
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -81,7 +101,11 @@ class MNIST_module(nk.nn.Module):
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=256, dtype=complex)(x)
      # 3rd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, 256)
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     #DROPOUT 2
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     #dense2 and softmax
@@ -98,7 +122,11 @@ class MNIST_complex_output(nk.nn.Module):
     #first convolutions 3x3 --> 32. 
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, (28,28,32))
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     # First pool, Avgpool/MaxPool 2x2 stride 2x2
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -110,7 +138,11 @@ class MNIST_complex_output(nk.nn.Module):
     # DROPOUT 1
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, (14,14,64))
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     # 2nd pool, Avgpool/MaxPool 2x2 stride 2x2
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -121,7 +153,11 @@ class MNIST_complex_output(nk.nn.Module):
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=256, dtype=complex)(x)
      # 3rd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, 256)
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     #DROPOUT 2
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     #dense2 and softmax
