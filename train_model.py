@@ -106,10 +106,12 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         # Generate adversarial examples
         # argnums = the index of the function argument wrt which the gradient is taken; default is 0, here we want 
         # index 2, which is 'image'
+        """
         _loss_fn2 = partial(loss_fn2, params=state.params, dropout_rng = dropout_rng, labels=batch['label'])
         grad = jax.grad(_loss_fn2)
         g = grad(batch['image'])
         #for epsilon in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
+        
         for epsilon in [0.2]:
             new_images = fgsm_update(batch['image'], g, epsilon)
             # Train on these
@@ -124,6 +126,7 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
             state = state.apply_gradients(grads=grads)
             # Evaluate the network again to get the log-probability distribution
         # over the batch images
+        """
         metrics = eval_metrics(state.params, batch, dropout_rng)
         
         return state, metrics
@@ -252,7 +255,6 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         dropout_rng, init_dropout = jax.random.split(jax.random.PRNGKey(1))
 
         state = create_train_state(init_rng, optimiser, init_dropout)
-        average_metrics = {"test_loss" : 0., "test_accuracy": 0., "train_loss":0., "train_accuracy":0.}
         metrics = {"test_loss" : [], "test_accuracy": [], "train_loss":[], "train_accuracy":[]}
         with tqdm(range(1, num_epochs + 1)) as pbar:
             for epoch in pbar:
@@ -272,8 +274,6 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
                 metrics["train_accuracy"].append(train_metrics["accuracy"])
                 metrics["test_loss"].append(test_loss)
                 metrics["test_accuracy"].append(test_accuracy)
-            for k in average_metrics:
-                average_metrics[k] /= 10
         models_saved += [state]
 
-    return models_saved, average_metrics
+    return models_saved, metrics
