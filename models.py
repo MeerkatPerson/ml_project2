@@ -55,7 +55,7 @@ class MNIST_dense(nk.nn.Module):
     #dense2 and softmax
     x = nk.nn.Dense(features=10, dtype=complex)(x)    # There are 10 classes in MNIST
     x = jnp.hstack((jnp.real(x), jnp.imag(x)))
-    x = nk.nn.Dense(features=10, dtype=complex)(x)
+    x = nk.nn.Dense(features=10)(x)
     x = nk.nn.log_softmax(x)
     return x
 
