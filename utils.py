@@ -14,14 +14,14 @@ from losses import *
 # (I.) Functionality for computing metrics (loss & accuracy)
 #      & returning them in a JSON format
 
-def compute_metrics(*, type_, logits, labels):
+def compute_metrics(*, logits, labels):
     """
     Compute metrics of the model during training.
     
     Returns the loss and the accuracy.
     """
 
-    if type_ == 'complex':
+    if logits.dtype == jnp.complex128 or logits.dtype == jnp.complex64:
 
         real = jnp.real(logits)
         imag = jnp.imag(logits)

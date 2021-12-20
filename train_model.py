@@ -180,7 +180,7 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         Used to check the performance of the network on training and test datasets.
         """
         logits = model.apply(params, batch['image'], rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=False)
-        return compute_metrics(type_ = type_, logits=logits, labels=batch['label'])
+        return compute_metrics(logits=logits, labels=batch['label'])
 
     def evaluate_model(params, test_ds, dropout_rng):
         """
@@ -202,14 +202,9 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         Loss function minimised during training of the model.
         """
         logits = model.apply(params, images, rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=True)
-
-        if type_ == 'complex':
-
+        if logits.dtype == jnp.complex64 or logits.dtype == jnp.complex128:
             return (cross_entropy(logits=jnp.real(logits), labels=labels) + cross_entropy(logits=jnp.imag(logits), labels=labels)) / 2
-
-        else: 
-
-            return cross_entropy(logits=logits, labels=labels)
+        return cross_entropy(logits=logits, labels=labels)
 
     def loss_fn2(images, dropout_rng, params, labels):
 
@@ -217,14 +212,9 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         Loss function minimised during training of the model.
         """
         logits = model.apply(params, images, rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=True)
-
-        if type_ == 'complex':
-
+        if logits.dtype == jnp.complex64 or logits.dtype == jnp.complex128:
             return (cross_entropy(logits=jnp.real(logits), labels=labels) + cross_entropy(logits=jnp.imag(logits), labels=labels)) / 2
-
-        else: 
-
-            return cross_entropy(logits=logits, labels=labels)
+        return cross_entropy(logits=logits, labels=labels)
 
     # ARRAY WHICH WHILL STORE THE MODELS (THERE WILL BE 10 BECAUSE WE WANT TO AVERAGE OVER A NUMBER OF MODELS FOR CONFIDENCE IN RESULTS )
     models_saved = []
@@ -244,8 +234,6 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
 
         #init model
         model = Model(n_classes=10)
-
-        pars = model.init(key, sample_input, activation=activation, pool=pool, train=True)
 
         # Split the rng to get two keys, one to 'shuffle' the dataset at every iteration,
         # and one to initialise the network
