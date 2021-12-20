@@ -61,8 +61,11 @@ class MNIST_complex_Model(nk.nn.Module):
 
     #dense2 and softmax
     x = nk.nn.Dense(features=10, dtype=complex)(x)    # There are 10 classes in MNIST
-    x = jnp.abs(x)
-    x = nk.nn.log_softmax(x)
+    
+    # Complex softmax
+    tmp_re = nk.nn.log_softmax(jnp.real(x))
+    tmp_im = nk.nn.log_softmax(jnp.imag(x))
+    x = jax.lax.complex(tmp_re, tmp_im)
 
     return x
 
@@ -170,11 +173,9 @@ class Audio_MNIST_complex_Model(nk.nn.Module):
 
     x = nk.nn.Dense(features=10, dtype=complex)(x)    # There are 10 classes in MNIST
 
-    x = jnp.abs(x) #<= I guess this isn't required anymore?
-
-    # In the Jax tutorial, log_softmax is used - should we use it too?
-    # => let's try
-    x = nk.nn.log_softmax(x)
+    tmp_re = nk.nn.log_softmax(jnp.real(x))
+    tmp_im = nk.nn.log_softmax(jnp.real(x))
+    x = jax.lax.complex(tmp_re, tmp_im)
 
     return x
 

@@ -10,6 +10,16 @@ from jax.numpy import sinh
 def complex_relu(z):
     return jnp.where(z.real > 0, z, 0)
 
+def crelu(z):
+    """
+    From Bengio et al., Deep Complex Networks
+    """
+    imag_relu = jax.nn.relu(z.imag)
+    real_relu = jax.nn.relu(z.real)
+
+    return real_relu + 1j * imag_relu
+
+
 def zrelu(z, epsilon=1e-7):
     """
     zReLU presented in "On Complex Valued Convolutional Neural Networks"

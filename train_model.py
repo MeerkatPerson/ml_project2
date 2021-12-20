@@ -15,6 +15,8 @@ from functools import partial
 
 import numpy as np
 
+from losses import *
+
 from utils import *
 
 """
@@ -26,7 +28,7 @@ from utils import *
 - loss_fn: the loss function to use, from losses.py
 - l_rate: the learning rate to use
 """
-def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
+def do_train(dataset, type_, Model, pool, activation, l_rate):
 
     """
     Load the data and generate input depending on the dataset (different shapes)
@@ -102,6 +104,8 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
         state = state.apply_gradients(grads=grads)
 
         # Generate adversarial examples
+        # argnums = the index of the function argument wrt which the gradient is taken; default is 0, here we want 
+        # index 2, which is 'image'
         _loss_fn2 = partial(loss_fn2, params=state.params, dropout_rng = dropout_rng, labels=batch['label'])
         grad = jax.grad(_loss_fn2)
         g = grad(batch['image'])
@@ -173,7 +177,7 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
         Used to check the performance of the network on training and test datasets.
         """
         logits = model.apply(params, batch['image'], rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=False)
-        return compute_metrics(loss_fun = loss_fun, logits=logits, labels=batch['label'])
+        return compute_metrics(type_ = type_, logits=logits, labels=batch['label'])
 
     def evaluate_model(params, test_ds, dropout_rng):
         """
@@ -185,22 +189,39 @@ def do_train(dataset, type_, Model, pool, activation, loss_fun, l_rate):
         return summary['loss'], summary['accuracy']
 
     """
-    Pt. III: losses (I don't know why there are 2)
+    Pt. III: loss (always uses cross_entropy from losses.py, but takes both the real and imaginary parts into account if
+    type_ == 'complex', i.e. wer're using a complex model)
     """
 
+    # We take the gradient with respect to params normally (argnums=0) and wrt images (argnums=2) for obtaining adversarial examples.
     def loss_fn(params, dropout_rng, images, labels):
         """
         Loss function minimised during training of the model.
         """
         logits = model.apply(params, images, rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=True)
-        return loss_fun(logits=logits, labels=labels)
 
-    def loss_fn2(images, params, dropout_rng, labels):
+        if type_ == 'complex':
+
+            return (cross_entropy(logits=jnp.real(logits), labels=labels) + cross_entropy(logits=jnp.imag(logits), labels=labels)) / 2
+
+        else: 
+
+            return cross_entropy(logits=logits, labels=labels)
+
+    def loss_fn2(images, dropout_rng, params, labels):
+
         """
         Loss function minimised during training of the model.
         """
         logits = model.apply(params, images, rngs={'dropout' : dropout_rng}, activation=activation, pool=pool, train=True)
-        return loss_fun(logits=logits, labels=labels)
+
+        if type_ == 'complex':
+
+            return (cross_entropy(logits=jnp.real(logits), labels=labels) + cross_entropy(logits=jnp.imag(logits), labels=labels)) / 2
+
+        else: 
+
+            return cross_entropy(logits=logits, labels=labels)
 
     # ARRAY WHICH WHILL STORE THE MODELS (THERE WILL BE 10 BECAUSE WE WANT TO AVERAGE OVER A NUMBER OF MODELS FOR CONFIDENCE IN RESULTS )
     models_saved = []

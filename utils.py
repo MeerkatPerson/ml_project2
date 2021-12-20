@@ -9,17 +9,30 @@ import matplotlib.pyplot as plt
 
 import jax.numpy as jnp
 
+from losses import *
+
 # (I.) Functionality for computing metrics (loss & accuracy)
 #      & returning them in a JSON format
 
-def compute_metrics(*, loss_fun, logits, labels):
+def compute_metrics(*, type_, logits, labels):
     """
     Compute metrics of the model during training.
     
     Returns the loss and the accuracy.
     """
-    loss = loss_fun(logits=logits, labels=labels)
-    accuracy = jnp.mean(jnp.argmax(logits, -1) == labels)
+
+    if type_ == 'complex':
+
+        real = jnp.real(logits)
+        imag = jnp.imag(logits)
+        loss = (cross_entropy(logits=real, labels=labels) + cross_entropy(logits=imag, labels=labels)) / 2
+        accuracy = jnp.mean(jnp.argmax((real + imag), -1) == labels)
+
+    else:
+
+        loss = cross_entropy(logits=logits, labels=labels)
+        accuracy = jnp.mean(jnp.argmax(logits, -1) == labels)
+
     metrics = {
       'loss': loss,
       'accuracy': accuracy,

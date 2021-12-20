@@ -22,7 +22,7 @@ if __name__ == '__main__':
     * learning_rate: for mnist 0.0005 is ideal apparently, for audio_mnist 0.001 performs well
     """
 
-    models_saved, metrics = do_train('mnist', 'complex', Audio_MNIST_complex_Model, 'avg', zrelu, cross_entropy, 0.0005)
+    models_saved, metrics = do_train('mnist', 'complex', MNIST_complex_Model, 'avg', crelu, 0.0005)
 
     """
     Note: The stuff below I have not yet parameterized
