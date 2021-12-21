@@ -63,12 +63,6 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         num_epochs = 50 # takes longer to converge (at least in the presence of adversarial examples)
 
     """
-    Many inner functions; with the current level of entanglement
-    among the functions I didn't see any other way
-    At least the functions that don't depend on the model I moved somewhere else
-    """
-
-    """
     Pt. I: functions related to training updates etc
     """
 
