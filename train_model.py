@@ -28,7 +28,7 @@ from utils import *
 - loss_fn: the loss function to use, from losses.py
 - l_rate: the learning rate to use
 """
-def do_train(dataset, type_, Model, pool, activation, l_rate):
+def do_train(dataset, type_, Model, pool, activation, l_rate, adversarial = False):
 
     """
     Load the data and generate input depending on the dataset (different shapes)
@@ -60,7 +60,21 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
             
             sample_input = jnp.ones([1, 20, 35])
 
-        num_epochs = 50 # takes longer to converge (at least in the presence of adversarial examples)
+        num_epochs = 80 # takes longer to converge (at least in the presence of adversarial examples)
+
+    elif dataset == 'cifar':
+
+        train_data, test_data = load_data.load_cifar()
+
+        if type_ == 'complex':
+
+            sample_input = jax._src.nn.initializers._complex_uniform(jax.random.PRNGKey(0), shape=[1, 32, 32, 3], dtype=complex)
+
+        else: 
+            
+            sample_input = jnp.ones([1, 32, 32, 3])
+
+        num_epochs = 80 
 
     """
     Pt. I: functions related to training updates etc
@@ -73,6 +87,8 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         # Construct the model parameters
         params = model.init({'params' : rng, 'dropout' : dropout_rng}, sample_input, activation=activation, pool=pool, train=True)
             
+        print(state.params['params'].keys())
+
         # Package all those informations in the model state
         return train_state.TrainState.create(
             apply_fn=model.apply, params=params, tx=optimiser)
@@ -100,27 +116,28 @@ def do_train(dataset, type_, Model, pool, activation, l_rate):
         # Generate adversarial examples
         # argnums = the index of the function argument wrt which the gradient is taken; default is 0, here we want 
         # index 2, which is 'image'
-        """
-        _loss_fn2 = partial(loss_fn2, params=state.params, dropout_rng = dropout_rng, labels=batch['label'])
-        grad = jax.grad(_loss_fn2)
-        g = grad(batch['image'])
-        #for epsilon in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
-        
-        for epsilon in [0.2]:
-            new_images = fgsm_update(batch['image'], g, epsilon)
-            # Train on these
-            _loss_fn3 = partial(loss_fn, dropout_rng = dropout_rng, images=new_images, labels=batch['label'])
-            val_grad_fn3 = jax.value_and_grad(_loss_fn3)
-            loss, grads = val_grad_fn3(state.params)
-            
-            # Compute the conjugate if complex model
-            if type_ == 'complex':
-                grads = jax.tree_map(lambda x: x.conj(), grads) 
+        if adversarial:
 
-            state = state.apply_gradients(grads=grads)
-            # Evaluate the network again to get the log-probability distribution
-        # over the batch images
-        """
+            _loss_fn2 = partial(loss_fn2, params=state.params, dropout_rng = dropout_rng, labels=batch['label'])
+            grad = jax.grad(_loss_fn2)
+            g = grad(batch['image'])
+            #for epsilon in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
+            
+            for epsilon in [0.2]:
+                new_images = fgsm_update(batch['image'], g, epsilon)
+                # Train on these
+                _loss_fn3 = partial(loss_fn, dropout_rng = dropout_rng, images=new_images, labels=batch['label'])
+                val_grad_fn3 = jax.value_and_grad(_loss_fn3)
+                loss, grads = val_grad_fn3(state.params)
+                
+                # Compute the conjugate if complex model
+                if type_ == 'complex':
+                    grads = jax.tree_map(lambda x: x.conj(), grads) 
+
+                state = state.apply_gradients(grads=grads)
+                # Evaluate the network again to get the log-probability distribution
+                # over the batch images
+ 
         metrics = eval_metrics(state.params, batch, dropout_rng)
         
         return state, metrics
