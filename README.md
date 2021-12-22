@@ -15,7 +15,7 @@ Additionally, we leveraged the complex-number support of [Netket](https://www.ne
 
 ## Models
 
-Each of the models are convolutional neural networks composed of a number of Convolutional-, Pooling-, Dropout-, as well as Dense layers. Each of the models are initialized with an activation function (to be chosen from `activations.py`) and a pooling strategy (currently supported are average- and max-pooling). All models make use of `cross_entropy` (`losses.py`), which is applied to the real and imaginary parts separately in the case of complex-valued models.
+Each of the models are convolutional neural networks composed of a number of Convolutional-, Pooling-, Dropout-, as well as Dense layers. Each of the models is initialized with an activation function (to be chosen from `activations.py`) and a pooling strategy (currently supported are average- and max-pooling). All models make use of the `cross_entropy` for quantifying losses (`losses.py`), which is applied to the real and imaginary parts separately in the case of complex-valued models.
 Additional properties of the different types of available models are discussed below.
 
 `models.py` contains four models for each of the three supported datasets (MNIST, CIFAR10, spoken_digits): 
