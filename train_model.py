@@ -86,8 +86,6 @@ def do_train(dataset, type_, Model, pool, activation, l_rate, adversarial = Fals
         """
         # Construct the model parameters
         params = model.init({'params' : rng, 'dropout' : dropout_rng}, sample_input, activation=activation, pool=pool, train=True)
-            
-        print(state.params['params'].keys())
 
         # Package all those informations in the model state
         return train_state.TrainState.create(

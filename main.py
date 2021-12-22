@@ -22,28 +22,27 @@ if __name__ == '__main__':
     * learning_rate: for mnist 0.0005 is ideal apparently, for audio_mnist 0.001 performs well
     """
 
-    _, metrics =  do_train('audio_mnist', 'complex', Audio_MNIST_module, 'avg', modrelu, 0.0005)
+    # _, metrics =  do_train('audio_mnist', 'complex', Audio_MNIST_module, 'avg', modrelu, 0.0005)
 
-    """
     activations = [complex_relu, modrelu, crelu]
     models = [Audio_MNIST_dense, Audio_MNIST_complex_output, Audio_MNIST_module]
     pooling = ['avg', 'max']
+    l_rates = [0.0005,0.005,0.05]
     res = []
 
     for activation in activations:
         for m in models :
             for pool in pooling :
-                results = dict()
-                results['dataset'] = 'audio_mnist'
-                results['model'] = str(m).split('.')[1]
-                results['pooling'] = pool
-                results['activation'] = activation.__name__
-                _, metrics =  do_train('audio_mnist', 'complex', m, pool, activation, 0.0005)
-                results['metrics'] = metrics
-                res.append(results)
-                print(results)
+                for l_rate in l_rates:
+                    results = dict()
+                    results['dataset'] = 'audio_mnist'
+                    results['model'] = str(m).split('.')[1]
+                    results['pooling'] = pool
+                    results['activation'] = activation.__name__
+                    _, metrics =  do_train('audio_mnist', 'complex', m, pool, activation, l_rate)
+                    results['metrics'] = metrics
+                    res.append(results)
+                    print(results)
 
     with open("/results/audio_mnist_non_adversarial/results.txt", "wb") as fp:   #Pickling
         pickle.dump(res, fp)
-
-    """
