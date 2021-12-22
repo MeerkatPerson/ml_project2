@@ -5,6 +5,10 @@ import netket as nk
 
 from activations import *
 
+from typing import Callable
+
+from flax.linen.initializers import uniform
+
 class MNIST_dense(nk.nn.Module):
   n_classes : int = 10
   @nk.nn.compact
@@ -114,7 +118,7 @@ class MNIST_module(nk.nn.Module):
     x = nk.nn.log_softmax(x)
     return x
 
-class MNIST_complex_output(nk.nn.Module):
+class MNIST_DoubleSoft(nk.nn.Module):
   n_classes : int = 10
   @nk.nn.compact
   def __call__(self, x, train, activation, pool = 'avg'):
@@ -219,7 +223,7 @@ class MNIST_complex_output(nk.nn.Module):
       return x
 
 
-class CIFAR_complex_output(nk.nn.Module):
+class CIFAR_DoubleSoft(nk.nn.Module):
   n_classes : int = 10
   @nk.nn.compact
   def __call__(self, x, train, activation, pool = 'avg'):
@@ -456,6 +460,7 @@ class CIFAR_module(nk.nn.Module):
 
 class Audio_MNIST_dense(nk.nn.Module):
   n_classes : int = 10
+
   @nk.nn.compact
   def __call__(self, x, train, activation, pool = 'avg'):
     #make rng for dropoutlayer
@@ -464,7 +469,8 @@ class Audio_MNIST_dense(nk.nn.Module):
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
     if activation.__name__ == "modrelu":
-      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      # bias1 = self.param('bias1', lambda rng, shape: jax.random.uniform(rng, shape, numpy.float64, -0.01, 0.01), x.shape[1:]) 
+      bias1 = self.param('bias1',uniform(scale=0.01),x.shape[1:])
       x = activation(x, bias1)
     else :
       x = activation(x)
@@ -480,7 +486,8 @@ class Audio_MNIST_dense(nk.nn.Module):
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
     if activation.__name__ == "modrelu":
-      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      # bias2 = self.param('bias2', lambda rng, shape: jax.random.uniform(rng, shape, numpy.float64, -0.01, 0.01), x.shape[1:]) 
+      bias2 = self.param('bias2',uniform(scale=0.01),x.shape[1:])
       x = activation(x, bias2)
     else :
       x = activation(x)
@@ -495,7 +502,8 @@ class Audio_MNIST_dense(nk.nn.Module):
     x = nk.nn.Dense(features=256, dtype=complex)(x)
     # 3rd activation
     if activation.__name__ == "modrelu":
-      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      #bias3 = self.param('bias3', lambda rng, shape: jax.random.uniform(rng, shape, numpy.float64, -0.01, 0.01), x.shape[1:]) 
+      bias3 = self.param('bias3', uniform(scale=0.01),(256,))
       x = activation(x, bias3)
     else :
       x = activation(x)
@@ -520,7 +528,7 @@ class Audio_MNIST_module(nk.nn.Module):
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
     if activation.__name__ == "modrelu":
-      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      bias1 = self.param('bias1',uniform(scale=0.01),x.shape[1:])
       x = activation(x, bias1)
     else :
       x = activation(x)
@@ -536,7 +544,7 @@ class Audio_MNIST_module(nk.nn.Module):
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
     if activation.__name__ == "modrelu":
-      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      bias2 = self.param('bias2',uniform(scale=0.01),x.shape[1:])
       x = activation(x, bias2)
     else :
       x = activation(x)
@@ -551,7 +559,7 @@ class Audio_MNIST_module(nk.nn.Module):
     x = nk.nn.Dense(features=256, dtype=complex)(x)
     # 3rd activation
     if activation.__name__ == "modrelu":
-      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      bias3 = self.param('bias3', uniform(scale=0.01),(256,))
       x = activation(x, bias3)
     else :
       x = activation(x)
@@ -563,7 +571,7 @@ class Audio_MNIST_module(nk.nn.Module):
     x = nk.nn.log_softmax(x)
     return x
 
-class Audio_MNIST_complex_output(nk.nn.Module):
+class Audio_MNIST_DoubleSoft(nk.nn.Module):
   n_classes : int = 10
   @nk.nn.compact
   def __call__(self, x, train, activation, pool = 'avg'):
@@ -573,7 +581,7 @@ class Audio_MNIST_complex_output(nk.nn.Module):
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
     if activation.__name__ == "modrelu":
-      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      bias1 = self.param('bias1',uniform(scale=0.01),x.shape[1:])
       x = activation(x, bias1)
     else :
       x = activation(x)
@@ -589,7 +597,7 @@ class Audio_MNIST_complex_output(nk.nn.Module):
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
     if activation.__name__ == "modrelu":
-      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      bias2 = self.param('bias2',uniform(scale=0.01),x.shape[1:])
       x = activation(x, bias2)
     else :
       x = activation(x)
@@ -604,7 +612,7 @@ class Audio_MNIST_complex_output(nk.nn.Module):
     x = nk.nn.Dense(features=256, dtype=complex)(x)
      # 3rd activation
     if activation.__name__ == "modrelu":
-      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      bias3 = self.param('bias3', uniform(scale=0.01),(256,))
       x = activation(x, bias3)
     else :
       x = activation(x)

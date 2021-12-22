@@ -7,7 +7,7 @@ from jax.numpy import cosh
 from jax.numpy import sinh
 
 @jit
-def complex_relu(z):
+def genrelu(z):
     return jnp.where(z.real > 0, z, 0)
 
 def crelu(z):
