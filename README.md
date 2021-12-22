@@ -26,7 +26,7 @@ Additional properties of the different types of available models are discussed b
 
 ## Python scripts
 
-Code execution as a pure python project is supported, with `main.py` as the entry point. From there, the `train_model.py` script, which contains the main logic for training and evaluating models, is called and the complexity thus conveniently hidden from the user (unless the user should desire to delve into the ~~hell~~ rollercoaster ride of Jax/Flax). 
+Code execution as a pure python project is supported, with `main.py` as the entry point. From there, the `train_model.py` script, which contains the main logic for training and evaluating models, is called and the complexity thus conveniently hidden from the user (unless they should desire to delve into the ~~hell~~ rollercoaster ride of Jax/Flax). 
 
 For each model, the user must specify a dataset ('mnist'/'cifar'/'audio_mnist'), a type ('complex'/'real'), a model (from `models.py`), a pooling strategy ('avg'/'max'), an activation function (from `activations.py`), a learning rate, and a boolean flag indicating if the model is to be trained in the presence of adversarial examples (True/False).
 

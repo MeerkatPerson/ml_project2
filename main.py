@@ -25,7 +25,7 @@ if __name__ == '__main__':
     #_, metrics =  do_train('audio_mnist', 'complex', Audio_MNIST_dense, 'avg', modrelu, 0.0005)
 
     activations = [genrelu, modrelu, crelu]
-    models = [Audio_MNIST_dense, Audio_MNIST_complex_output, Audio_MNIST_module]
+    models = [Audio_MNIST_dense, Audio_MNIST_DoubleSoft, Audio_MNIST_module]
     pooling = ['avg', 'max']
     l_rates = [0.0005,0.005,0.05]
     res = []
