@@ -226,9 +226,15 @@ class CIFAR_complex_output(nk.nn.Module):
     dropout_rng = self.make_rng('dropout')
     #first TWO convolutions 3x3 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 1st activation
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias1)
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 2nd activation
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias2)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -237,9 +243,15 @@ class CIFAR_complex_output(nk.nn.Module):
 
     #second TWO convolutions 64x64 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=64, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 3rd activation
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias3)
     x = nk.nn.Conv(features=64, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 4th activation
+    if activation.__name__ == "modrelu":
+      bias4 = self.param('bias4', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias4)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -248,9 +260,15 @@ class CIFAR_complex_output(nk.nn.Module):
 
     #third TWO convolutions 128x128 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=128, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 5th activation
+    if activation.__name__ == "modrelu":
+      bias5 = self.param('bias5', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias5)
     x = nk.nn.Conv(features=128, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 6th activation
+    if activation.__name__ == "modrelu":
+      bias6 = self.param('bias6', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias6)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -260,7 +278,10 @@ class CIFAR_complex_output(nk.nn.Module):
     #flatten and dense
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=128, dtype=complex)(x)
-    x = activation(x)
+    # 7th activation
+    if activation.__name__ == "modrelu":
+      bias7 = self.param('bias7', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias7)
 
     #dense2 and softmax
     x = nk.nn.Dense(features=10, dtype=complex)(x)
@@ -278,9 +299,19 @@ class CIFAR_dense(nk.nn.Module):
     dropout_rng = self.make_rng('dropout')
     #first TWO convolutions 3x3 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # First activation
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 2nd activation
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -289,9 +320,15 @@ class CIFAR_dense(nk.nn.Module):
 
     #second TWO convolutions 64x64 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=64, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 3rd activation
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias3)
     x = nk.nn.Conv(features=64, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 4th activation
+    if activation.__name__ == "modrelu":
+      bias4 = self.param('bias4', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias4)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -300,9 +337,15 @@ class CIFAR_dense(nk.nn.Module):
 
     #third TWO convolutions 128x128 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=128, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 5th activation
+    if activation.__name__ == "modrelu":
+      bias5 = self.param('bias5', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias5)
     x = nk.nn.Conv(features=128, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 6th activation
+    if activation.__name__ == "modrelu":
+      bias6 = self.param('bias6', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias6)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -312,7 +355,10 @@ class CIFAR_dense(nk.nn.Module):
     #flatten and dense
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=128, dtype=complex)(x)
-    x = activation(x)
+    # 7th activation
+    if activation.__name__ == "modrelu":
+      bias7 = self.param('bias7', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias7)
 
     #dense2 and softmax
     x = nk.nn.Dense(features=10, dtype=complex)(x)
@@ -328,9 +374,19 @@ class CIFAR_module(nk.nn.Module):
     dropout_rng = self.make_rng('dropout')
     #first TWO convolutions 3x3 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # First activation
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 2nd activation
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -339,9 +395,19 @@ class CIFAR_module(nk.nn.Module):
 
     #second TWO convolutions 64x64 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=64, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 3rd activation
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     x = nk.nn.Conv(features=64, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 4th activation
+    if activation.__name__ == "modrelu":
+      bias4 = self.param('bias4', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias4)
+    else :
+      x = activation(x)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -350,9 +416,19 @@ class CIFAR_module(nk.nn.Module):
 
     #third TWO convolutions 128x128 --> 32. Avgpol 2x2 stride 2x2. Dropout 0.2
     x = nk.nn.Conv(features=128, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 5th activation
+    if activation.__name__ == "modrelu":
+      bias5 = self.param('bias5', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias5)
+    else :
+      x = activation(x)
     x = nk.nn.Conv(features=128, kernel_size=(3, 3), dtype = complex)(x)
-    x = activation(x)
+    # 6th activation
+    if activation.__name__ == "modrelu":
+      bias6 = self.param('bias6', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias6)
+    else :
+      x = activation(x)
     if pool == 'max':
       x = flax.linen.max_pool(jnp.abs(x), window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
     else:
@@ -362,7 +438,12 @@ class CIFAR_module(nk.nn.Module):
     #flatten and dense
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=128, dtype=complex)(x)
-    x = activation(x)
+    # 7th activation
+    if activation.__name__ == "modrelu":
+      bias7 = self.param('bias7', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias7)
+    else :
+      x = activation(x)
 
     #dense2 and softmax
     x = nk.nn.Dense(features=10, dtype=complex)(x)
@@ -382,7 +463,11 @@ class Audio_MNIST_dense(nk.nn.Module):
     #first convolutions 3x3 --> 32. 
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     # First pool, Avgpool/MaxPool 1x3 stride 1x3
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -394,7 +479,11 @@ class Audio_MNIST_dense(nk.nn.Module):
     # DROPOUT 1
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     # 2nd pool, Avgpool/MaxPool 1x3 stride 1x3
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -405,7 +494,11 @@ class Audio_MNIST_dense(nk.nn.Module):
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=256, dtype=complex)(x)
     # 3rd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     #DROPOUT 2
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     #dense2 and softmax
@@ -426,7 +519,11 @@ class Audio_MNIST_module(nk.nn.Module):
     #first convolutions 3x3 --> 32. 
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     # First pool, Avgpool/MaxPool 1x3 stride 1x3
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -438,7 +535,11 @@ class Audio_MNIST_module(nk.nn.Module):
     # DROPOUT 1
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     # 2nd pool, Avgpool/MaxPool 1x3 stride 1x3
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -449,7 +550,11 @@ class Audio_MNIST_module(nk.nn.Module):
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=256, dtype=complex)(x)
     # 3rd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     #DROPOUT 2
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     #dense2 and softmax
@@ -467,7 +572,11 @@ class Audio_MNIST_complex_output(nk.nn.Module):
     #first convolutions 3x3 --> 32. 
     x = nk.nn.Conv(features=32, kernel_size=(3, 3), dtype=complex)(x)
     # First activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias1 = self.param('bias1', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias1)
+    else :
+      x = activation(x)
     # First pool, Avgpool/MaxPool 1x3 stride 1x3
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -479,7 +588,11 @@ class Audio_MNIST_complex_output(nk.nn.Module):
     # DROPOUT 1
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     # 2nd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias2 = self.param('bias2', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias2)
+    else :
+      x = activation(x)
     # 2nd pool, Avgpool/MaxPool 1x3 stride 1x3
     # Use a flag to create the possibility of using a max pooling layer rather than avg
     if pool == 'max':
@@ -490,7 +603,11 @@ class Audio_MNIST_complex_output(nk.nn.Module):
     x = x.reshape((x.shape[0], -1))
     x = nk.nn.Dense(features=256, dtype=complex)(x)
      # 3rd activation
-    x = activation(x)
+    if activation.__name__ == "modrelu":
+      bias3 = self.param('bias3', jax.nn.initializers.zeros, x.shape[1:])
+      x = activation(x, bias3)
+    else :
+      x = activation(x)
     #DROPOUT 2
     x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
     #dense2 and softmax
@@ -560,3 +677,5 @@ class Audio_MNIST_complex_output(nk.nn.Module):
       x = nk.nn.log_softmax(x)
 
       return x
+
+  # jnp.ones(x.shape[1:])
