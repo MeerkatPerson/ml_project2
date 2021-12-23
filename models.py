@@ -173,54 +173,54 @@ class MNIST_DoubleSoft(nk.nn.Module):
     x = jax.lax.complex(tmp_re, tmp_im)
     return x
 
-  class MNIST_real_Model(nk.nn.Module):
-    n_classes : int = 10
-    @nk.nn.compact
-    def __call__(self, x, train, activation, pool = 'avg'):
-      #make rng for dropout
-      dropout_rng = self.make_rng('dropout')
+class MNIST_real_Model(nk.nn.Module):
+  n_classes : int = 10
+  @nk.nn.compact
+  def __call__(self, x, train, activation, pool = 'avg'):
+    #make rng for dropout
+    dropout_rng = self.make_rng('dropout')
 
-      #first convolutions 3x3 --> 32. Avgpol 2x2 stride 2x2
-      x = nk.nn.Conv(features=64, kernel_size=(3, 3))(x)
-      x = activation(x)
-      
-      # First pool, Avgpool/MaxPool 2x2 stride 2x2
-      # Use a flag to create the possibility of using a max pooling layer rather than avg
-      if pool == 'max':
+    #first convolutions 3x3 --> 32. Avgpol 2x2 stride 2x2
+    x = nk.nn.Conv(features=64, kernel_size=(3, 3))(x)
+    x = activation(x)
+    
+    # First pool, Avgpool/MaxPool 2x2 stride 2x2
+    # Use a flag to create the possibility of using a max pooling layer rather than avg
+    if pool == 'max':
 
-        x = flax.linen.max_pool(x, window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
+      x = flax.linen.max_pool(x, window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
 
-      else:
+    else:
 
-        x = flax.linen.avg_pool(x, window_shape=(2, 2), strides=(2, 2)) 
+      x = flax.linen.avg_pool(x, window_shape=(2, 2), strides=(2, 2)) 
 
-      #second convolution 3x3 -->64. Avgpol 2x2 stride 2x2
-      x = nk.nn.Conv(features=128, kernel_size=(3, 3))(x)
-      x = flax.linen.Dropout(0.5, deterministic=not train)(x) #DROPOUT 1
-      x = activation(x)
-      
-      # 2nd pool, Avgpool/MaxPool 2x2 stride 2x2
-      # Use a flag to create the possibility of using a max pooling layer rather than avg
-      if pool == 'max':
+    #second convolution 3x3 -->64. Avgpol 2x2 stride 2x2
+    x = nk.nn.Conv(features=128, kernel_size=(3, 3))(x)
+    x = flax.linen.Dropout(0.5, deterministic=not train)(x) #DROPOUT 1
+    x = activation(x)
+    
+    # 2nd pool, Avgpool/MaxPool 2x2 stride 2x2
+    # Use a flag to create the possibility of using a max pooling layer rather than avg
+    if pool == 'max':
 
-        x = flax.linen.max_pool(x, window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
+      x = flax.linen.max_pool(x, window_shape=(2, 2), strides=(2, 2)) # max pooling as suggested in Guberman (2016)
 
-      else:
+    else:
 
-        x = flax.linen.avg_pool(x, window_shape=(2, 2), strides=(2, 2)) 
+      x = flax.linen.avg_pool(x, window_shape=(2, 2), strides=(2, 2)) 
 
-      #flatten and dense 1
-      x = x.reshape((x.shape[0], -1)) # Flatten
-      x = nk.nn.Dense(features=256)(x)
-      x = activation(x)
+    #flatten and dense 1
+    x = x.reshape((x.shape[0], -1)) # Flatten
+    x = nk.nn.Dense(features=256)(x)
+    x = activation(x)
 
-      #DROPOUT2
-      x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
+    #DROPOUT2
+    x = flax.linen.Dropout(0.5, deterministic=not train)(x) 
 
-      #dense2 and softmax
-      x = nk.nn.Dense(features=10)(x)
-      x = nk.nn.log_softmax(x)
-      return x
+    #dense2 and softmax
+    x = nk.nn.Dense(features=10)(x)
+    x = nk.nn.log_softmax(x)
+    return x
 
 
 class CIFAR_DoubleSoft(nk.nn.Module):
