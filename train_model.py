@@ -60,7 +60,7 @@ def do_train(dataset, type_, Model, pool, activation, l_rate, adversarial = Fals
             
             sample_input = jnp.ones([1, 20, 35])
 
-        num_epochs = 80 # takes longer to converge (at least in the presence of adversarial examples)
+        num_epochs = 60 # takes longer to converge (at least in the presence of adversarial examples)
 
     elif dataset == 'cifar':
 
