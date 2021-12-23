@@ -33,17 +33,17 @@ if __name__ == '__main__':
     for activation in activations:
         for m in models :
             for pool in pooling :
-                for l_rate in l_rates:
-                    results = dict()
-                    results['dataset'] = 'audio_mnist'
-                    results['model'] = str(m).split('.')[1]
-                    results['pooling'] = pool
-                    results['activation'] = activation.__name__
-                    results['learning_rate'] = str(l_rate)
-                    _, metrics =  do_train('audio_mnist', 'complex', m, pool, activation, l_rate)
-                    results['metrics'] = metrics
-                    res.append(results)
-                    print(results)
+                #for l_rate in l_rates:
+                results = dict()
+                results['dataset'] = 'audio_mnist'
+                results['model'] = str(m).split('.')[1]
+                results['pooling'] = pool
+                results['activation'] = activation.__name__
+                #results['learning_rate'] = str(l_rate)
+                _, metrics =  do_train('audio_mnist', 'complex', m, pool, activation, 0.0005)
+                results['metrics'] = metrics
+                res.append(results)
+                print(results)
 
     with open("audio_mnist_results.txt", "wb") as fp:   #Pickling
         pickle.dump(res, fp)
